@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:lastest
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+
+  example-backend:
+    build: ./example-backend
+    ports:
+      - 8080:8080
+    environment:
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+
+  example-frontend:
+    build: ./example-frontend
+    ports:
+      - 5001:5000
+
+  redis:
+    image: redis:latest
