@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  nginx-reverse-proxy:
+    image: nginx:latest
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - example-backend
+      - example-frontend
+
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  example-backend:
+    build: ./example-backend
+#    ports:
+#      - 8080:8080
+    environment:
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=db
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+
+  example-frontend:
+    build: ./example-frontend
+    ports:
+      - 5001:5000
+
+
+  redis:
+    image: redis:latest
+
+volumes:
+  database:
